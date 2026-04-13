@@ -53,28 +53,94 @@ export default function ChatInterface({ messages, isStreaming, onTtsPlay }) {
                 {isAssistant ? m.modelName || m.model || 'NEXAI' : 'YOU'}
                 {m.searchUsed && <span style={{ color: 'var(--accent-teal)' }}>[ WEB SEARCHED ]</span>}
               </div>
+              {isAssistant && m.sources && m.sources.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  marginBottom: '16px',
+                  overflowX: 'auto',
+                  paddingBottom: '8px',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none'
+                }}>
+                  {m.sources.map((s, idx) => {
+                    let hostname = 'link';
+                    try { hostname = new URL(s.url).hostname.replace('www.', ''); } catch(e){}
+                    return (
+                      <a key={idx} href={s.url} target="_blank" rel="noopener noreferrer" style={{
+                        flex: '0 0 240px',
+                        background: 'var(--bg-surface-active)',
+                        backdropFilter: 'blur(24px)',
+                        border: '1px solid var(--glass-border-strong)',
+                        borderRadius: '12px',
+                        padding: '12px 16px',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px',
+                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        position: 'relative',
+                        overflow: 'hidden'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = 'var(--glass-shadow)';
+                        e.currentTarget.style.borderColor = 'var(--accent-teal)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.borderColor = 'var(--glass-border-strong)';
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ 
+                            background: 'var(--accent-teal)',
+                            color: '#000',
+                            fontSize: '9px',
+                            fontFamily: 'var(--font-mono)',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontWeight: 'bold'
+                          }}>Source {idx + 1}</span>
+                          <span style={{
+                            fontSize: '11px',
+                            color: 'var(--text-muted)',
+                            fontFamily: 'var(--font-mono)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}>{hostname}</span>
+                        </div>
+                        <h4 style={{ 
+                          margin: 0, 
+                          color: 'var(--text-primary)', 
+                          fontSize: '13px', 
+                          fontFamily: 'var(--font-sans)', 
+                          fontWeight: 500,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>{s.title}</h4>
+                        <p style={{
+                          margin: 0,
+                          color: 'var(--text-secondary)',
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-serif)',
+                          lineHeight: '1.4',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}>{s.summary}</p>
+                      </a>
+                    )
+                  })}
+                </div>
+              )}
               <div 
                 className="message-content"
                 dangerouslySetInnerHTML={{ __html: parseMarkdown(m.content) + (isLatestStream ? '<span class="streaming-dot"></span>' : '') }}
               />
-              {isAssistant && m.sources && m.sources.length > 0 && (
-                <div style={{ marginTop: '16px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {m.sources.map((s, idx) => (
-                    <a key={idx} href={s.url} target="_blank" rel="noopener noreferrer" style={{
-                      fontSize: '11px',
-                      fontFamily: 'var(--font-mono)',
-                      color: 'var(--accent-amethyst)',
-                      textDecoration: 'none',
-                      background: 'rgba(168, 85, 247, 0.1)',
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      border: '1px solid rgba(168, 85, 247, 0.2)'
-                    }}>
-                      [{idx + 1}] {s.title?.slice(0, 30)}
-                    </a>
-                  ))}
-                </div>
-              )}
             </div>
           );
         })}

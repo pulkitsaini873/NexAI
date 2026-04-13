@@ -37,7 +37,7 @@ export default function ImagePanel() {
   }
 
   return (
-    <div style={{ padding: '0 40px 140px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+    <div style={{ padding: '0 40px 140px', maxWidth: '1200px', margin: '0 auto', width: '100%', flex: 1, overflowY: 'auto' }}>
       <h1 className="panel-header" style={{ marginBottom: '8px' }}>Image Synthesis</h1>
       <p style={{ color: 'var(--text-secondary)', marginBottom: '40px', fontFamily: 'var(--font-sans)', fontWeight: 300 }}>
         Render your imagination using NVIDIA NIM or connected AI providers.

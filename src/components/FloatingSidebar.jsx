@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-const FloatingSidebar = memo(({ activeTab, onTabChange, onNewChat }) => {
+const FloatingSidebar = memo(({ activeTab, onTabChange, onNewChat, isHistoryOpen, onHistoryToggle }) => {
   const tabs = [
     {
       id: 'chat',
@@ -42,11 +42,23 @@ const FloatingSidebar = memo(({ activeTab, onTabChange, onNewChat }) => {
         className="dock-item" 
         data-label="New Chat" 
         onClick={onNewChat}
-        style={{ marginBottom: '16px' }}
+        style={{ marginBottom: '8px' }}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+
+      <button
+        className={`dock-item ${isHistoryOpen ? 'active' : ''}`}
+        data-label="History"
+        onClick={onHistoryToggle}
+        style={{ marginBottom: '16px' }}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
         </svg>
       </button>
 

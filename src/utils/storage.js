@@ -11,33 +11,61 @@ const STORAGE_KEYS = {
 };
 
 /**
- * Save chat history
+ * Save a chat session
  */
-export function saveChatHistory(messages) {
+export function saveSession(id, title, messages) {
   try {
-    localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(messages));
+    const sessions = loadSessions();
+    const index = sessions.findIndex(s => s.id === id);
+    const updated = { id, title, messages, updatedAt: Date.now() };
+    
+    if (index >= 0) {
+      sessions[index] = updated;
+    } else {
+      sessions.push(updated);
+    }
+    
+    // Sort descending by time
+    sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+    localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(sessions));
   } catch (e) {
-    console.warn('Failed to save chat history:', e);
+    console.warn('Failed to save session:', e);
   }
 }
 
 /**
- * Load chat history
+ * Load all chat sessions
  */
-export function loadChatHistory() {
+export function loadSessions() {
   try {
     const data = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY);
-    return data ? JSON.parse(data) : [];
+    if (!data) return [];
+    
+    const parsed = JSON.parse(data);
+    
+    // Migration: If the old format was an array of messages directly instead of sessions
+    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].role) {
+      const migrated = [{ id: 'legacy-session', title: 'Previous Chat', messages: parsed, updatedAt: Date.now() }];
+      localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(migrated));
+      return migrated;
+    }
+    
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
 
 /**
- * Clear chat history
+ * Delete a specific chat session
  */
-export function clearChatHistory() {
-  localStorage.removeItem(STORAGE_KEYS.CHAT_HISTORY);
+export function deleteSession(id) {
+  try {
+    const sessions = loadSessions().filter(s => s.id !== id);
+    localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(sessions));
+  } catch (e) {
+    console.warn('Failed to delete session:', e);
+  }
 }
 
 /**

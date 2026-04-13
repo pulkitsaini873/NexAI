@@ -7,13 +7,18 @@ import ModelSelector from './components/ModelSelector';
 import ApiKeyModal from './components/ApiKeyModal'; 
 import ImagePanel from './components/ImagePanel';
 import SettingsPanel from './components/SettingsPanel';
+import ChatHistoryTray from './components/ChatHistoryTray';
+
+// The earlier imports are handled. Here is where the layout hooks.
+
 
 import { streamChat } from './services/providerAdapter';
-import { searchWeb, buildSearchContext } from './services/searchService';
+import { searchWeb, buildSearchContext, synthesizeSearchData } from './services/searchService';
 import { synthesizeSpeech, playAudio } from './services/mediaService';
 import { 
-  loadChatHistory, 
-  saveChatHistory, 
+  loadSessions, 
+  saveSession, 
+  deleteSession, 
   loadPreferences, 
   savePreferences,
   loadSystemPrompt
@@ -23,6 +28,10 @@ import { getModelsByProvider } from './config/models';
 export default function App() {
   const [activeTab, setActiveTab] = useState('chat');
   const [messages, setMessages] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [activeSessionId, setActiveSessionId] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
   const [selectedModel, setSelectedModel] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
@@ -31,7 +40,18 @@ export default function App() {
   const abortControllerRef = useRef(null);
 
   useEffect(() => {
-    setMessages(loadChatHistory());
+    const loadedSessions = loadSessions();
+    setSessions(loadedSessions);
+    
+    if (loadedSessions.length > 0) {
+      setActiveSessionId(loadedSessions[0].id);
+      setMessages(loadedSessions[0].messages || []);
+    } else {
+      const initId = crypto.randomUUID();
+      setActiveSessionId(initId);
+      setSessions([{ id: initId, title: 'New Chat', messages: [], updatedAt: Date.now() }]);
+    }
+
     const prefs = loadPreferences();
     setSelectedModel(prefs.selectedModel);
     setWebSearchEnabled(prefs.webSearchDefault || false);
@@ -44,8 +64,27 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    saveChatHistory(messages);
-  }, [messages]);
+    if (activeSessionId && (messages.length > 0 || sessions.length === 1)) {
+      let title = 'New Chat';
+      const userMsg = messages.find(m => m.role === 'user');
+      if (userMsg && userMsg.content) {
+        title = userMsg.content.substring(0, 30) + (userMsg.content.length > 30 ? '...' : '');
+      }
+
+      saveSession(activeSessionId, title, messages);
+      
+      setSessions(prev => {
+        const idx = prev.findIndex(s => s.id === activeSessionId);
+        const updated = { id: activeSessionId, title, messages, updatedAt: Date.now() };
+        if (idx >= 0) {
+           const next = [...prev];
+           next[idx] = updated;
+           return next.sort((a, b) => b.updatedAt - a.updatedAt);
+        }
+        return [updated, ...prev].sort((a, b) => b.updatedAt - a.updatedAt);
+      });
+    }
+  }, [messages, activeSessionId]);
 
   useEffect(() => {
     if (selectedModel) {
@@ -54,11 +93,39 @@ export default function App() {
   }, [selectedModel]);
 
   function handleNewChat() {
+    const id = crypto.randomUUID();
+    const newSession = { id, title: 'New Chat', messages: [], updatedAt: Date.now() };
+    setSessions(prev => [newSession, ...prev]);
+    setActiveSessionId(id);
     setMessages([]);
     setActiveTab('chat');
+    setIsHistoryOpen(false);
     if (currentAudio) {
       currentAudio.stop();
       setCurrentAudio(null);
+    }
+  }
+
+  function handleSelectSession(id) {
+    const session = sessions.find(s => s.id === id);
+    if (session) {
+      setActiveSessionId(id);
+      setMessages(session.messages || []);
+      setActiveTab('chat');
+    }
+  }
+
+  function handleDeleteSession(id) {
+    deleteSession(id);
+    const updated = sessions.filter(s => s.id !== id);
+    setSessions(updated);
+    if (activeSessionId === id) {
+      if (updated.length > 0) {
+        setActiveSessionId(updated[0].id);
+        setMessages(updated[0].messages || []);
+      } else {
+        handleNewChat();
+      }
     }
   }
 
@@ -78,21 +145,24 @@ export default function App() {
       if (webSearchEnabled) {
         setMessages((prev) => [
           ...prev, 
-          { role: 'assistant', content: '', _searchIndicator: true }
+          { role: 'assistant', content: 'Agentic Research initializing...', _searchIndicator: true }
         ]);
         
         try {
-          const results = await searchWeb(content);
-          if (results.length > 0) {
-            sources = results;
+          const rawResults = await searchWeb(content);
+          if (rawResults.length > 0) {
+            setMessages((prev) => prev.map(m => m._searchIndicator ? { ...m, content: 'Synthesizing data...' } : m));
+            const synthesized = await synthesizeSearchData(content, rawResults);
+            
+            sources = synthesized;
             searchUsed = true;
-            finalContent = `${content}\n\n${buildSearchContext(results)}`;
+            finalContent = `${content}\n\n${buildSearchContext(synthesized)}`;
           }
         } catch (e) {
-          toast.error('Web search failed, proceeding normally.');
+          toast.error('Search synthesis failed, proceeding normally.');
         }
         
-        updatedMessages = setMessages((prev) => prev.filter(m => !m._searchIndicator));
+        setMessages((prev) => prev.filter(m => !m._searchIndicator));
       }
 
       const assistantMessageId = Date.now().toString();
@@ -199,6 +269,16 @@ export default function App() {
           activeTab={activeTab} 
           onTabChange={setActiveTab} 
           onNewChat={handleNewChat}
+          isHistoryOpen={isHistoryOpen}
+          onHistoryToggle={() => setIsHistoryOpen(!isHistoryOpen)}
+        />
+        
+        <ChatHistoryTray 
+          isOpen={isHistoryOpen}
+          sessions={sessions}
+          activeSessionId={activeSessionId}
+          onSelect={(id) => { handleSelectSession(id); setIsHistoryOpen(false); }}
+          onDelete={handleDeleteSession}
         />
 
         <main className="view-container">

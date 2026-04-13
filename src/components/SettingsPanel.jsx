@@ -61,7 +61,7 @@ export default function SettingsPanel() {
   };
 
   return (
-    <div style={{ padding: '0 40px 140px', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+    <div style={{ padding: '0 40px 140px', maxWidth: '800px', margin: '0 auto', width: '100%', flex: 1, overflowY: 'auto' }}>
       <h1 className="panel-header" style={{ marginBottom: '8px' }}>System Configuration</h1>
       <p style={{ color: 'var(--text-secondary)', marginBottom: '40px', fontFamily: 'var(--font-sans)', fontWeight: 300 }}>
         Manage access keys, behaviors, and core capabilities.
@@ -120,7 +120,7 @@ export default function SettingsPanel() {
           Provider Access Keys
         </h2>
         
-        {['groq', 'google', 'openrouter', 'nvidia', 'mistral'].map(provider => (
+        {['GROQ', 'GOOGLE', 'OPENROUTER', 'NVIDIA', 'MISTRAL'].map(provider => (
           <div key={provider}>
             <label style={labelStyle}>{provider} API Key</label>
             <input

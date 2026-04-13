@@ -51,6 +51,18 @@ export const CHAT_MODELS = [
     badge: 'new',
   },
   {
+    id: 'gemma2-9b-it',
+    name: 'Gemma 2 9B',
+    provider: 'GROQ',
+    badge: null,
+  },
+  {
+    id: 'mixtral-8x7b-32768',
+    name: 'Mixtral 8x7B',
+    provider: 'GROQ',
+    badge: null,
+  },
+  {
     id: 'qwen/qwen3-32b',
     name: 'Qwen3 32B',
     provider: 'GROQ',
@@ -58,6 +70,18 @@ export const CHAT_MODELS = [
   },
 
   // Google AI Studio
+  {
+    id: 'gemini-1.5-pro',
+    name: 'Gemini 1.5 Pro',
+    provider: 'GOOGLE',
+    badge: 'pro',
+  },
+  {
+    id: 'gemini-1.5-flash',
+    name: 'Gemini 1.5 Flash',
+    provider: 'GOOGLE',
+    badge: 'fast',
+  },
   {
     id: 'gemini-2.5-flash',
     name: 'Gemini 2.5 Flash',
@@ -71,7 +95,7 @@ export const CHAT_MODELS = [
     badge: 'pro',
   },
 
-  // OpenRouter
+  // OpenRouter (Free Tier Highlights)
   {
     id: 'deepseek/deepseek-r1:free',
     name: 'DeepSeek R1',
@@ -79,28 +103,52 @@ export const CHAT_MODELS = [
     badge: 'reasoning',
   },
   {
+    id: 'google/gemini-2.5-flash-free',
+    name: 'Gemini 2.5 Flash (OR)',
+    provider: 'OPENROUTER',
+    badge: 'free',
+  },
+  {
+    id: 'liquid/lfm-40b:free',
+    name: 'Liquid LFM 40B',
+    provider: 'OPENROUTER',
+    badge: 'free',
+  },
+  {
+    id: 'meta-llama/llama-3.1-8b-instruct:free',
+    name: 'Llama 3.1 8B',
+    provider: 'OPENROUTER',
+    badge: 'free',
+  },
+  {
     id: 'meta-llama/llama-4-maverick:free',
     name: 'Llama 4 Maverick',
     provider: 'OPENROUTER',
     badge: 'new',
   },
-  {
-    id: 'qwen/qwen3-235b-a22b:free',
-    name: 'Qwen3 235B',
-    provider: 'OPENROUTER',
-    badge: null,
-  },
 
-  // NVIDIA NIM
+  // NVIDIA NIM (Explicit Identifiers required for OpenAI format)
   {
-    id: 'nvidia/llama-3.1-nemotron-70b-instruct',
-    name: 'Nemotron 70B',
+    id: 'meta/llama-3.1-405b-instruct',
+    name: 'Llama 3.1 405B',
+    provider: 'NVIDIA',
+    badge: 'huge',
+  },
+  {
+    id: 'meta/llama-3.1-70b-instruct',
+    name: 'Llama 3.1 70B',
     provider: 'NVIDIA',
     badge: null,
   },
   {
-    id: 'qwen/qwen2.5-72b-instruct',
-    name: 'Qwen 2.5 72B',
+    id: 'nvidia/llama-3.1-nemotron-70b-instruct',
+    name: 'Nemotron 70B',
+    provider: 'NVIDIA',
+    badge: 'nvidia',
+  },
+  {
+    id: 'mistralai/mixtral-8x22b-instruct-v0.1',
+    name: 'Mixtral 8x22B',
     provider: 'NVIDIA',
     badge: null,
   },
@@ -111,6 +159,18 @@ export const CHAT_MODELS = [
     name: 'Mistral Large',
     provider: 'MISTRAL',
     badge: 'pro',
+  },
+  {
+    id: 'mistral-small-latest',
+    name: 'Mistral Small',
+    provider: 'MISTRAL',
+    badge: 'fast',
+  },
+  {
+    id: 'open-mixtral-8x22b',
+    name: 'Mixtral 8x22B',
+    provider: 'MISTRAL',
+    badge: null,
   },
   {
     id: 'codestral-latest',

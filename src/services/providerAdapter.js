@@ -16,6 +16,18 @@ export function getApiKey(providerKey) {
 }
 
 /**
+ * Get all configured API keys
+ */
+export function getApiKeys() {
+  const keys = {};
+  for (const [key, provider] of Object.entries(PROVIDERS)) {
+    const val = localStorage.getItem(provider.keyName);
+    if (val) keys[key] = val;
+  }
+  return keys;
+}
+
+/**
  * Check if an API key is configured for a provider
  */
 export function hasApiKey(providerKey) {
