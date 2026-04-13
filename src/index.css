@@ -1,0 +1,513 @@
+/* =============================================
+   NexAI Design System — Ethereal Glassmorphism
+   ============================================= */
+
+:root {
+  /* Core Colors */
+  --bg-deep: #050608;
+  --bg-base: #090A0F;
+  --bg-surface: rgba(18, 20, 28, 0.4);
+  --bg-surface-hover: rgba(25, 28, 40, 0.6);
+  --bg-surface-active: rgba(30, 34, 50, 0.8);
+  
+  /* Text Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --text-inverse: #050608;
+
+  /* Accents */
+  --accent-teal: #2DD4BF;
+  --accent-amethyst: #A855F7;
+  --accent-indigo: #6366F1;
+  --accent-blue: #3B82F6;
+
+  /* Glass Effects */
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-strong: rgba(255, 255, 255, 0.15);
+  --glass-gradient: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 100%);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+
+  /* Fonts */
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing & Sizes */
+  --island-width: min(800px, 95vw);
+  --dock-height: 64px;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  z-index: 1;
+}
+
+/* =============================================
+   Animated Aurora Background
+   ============================================= */
+
+.aurora-container {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+}
+
+.aurora-blob {
+  position: absolute;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: float 20s infinite ease-in-out alternate;
+  will-change: transform;
+}
+
+.blob-1 {
+  width: 60vw;
+  height: 60vh;
+  background: radial-gradient(circle, var(--accent-indigo) 0%, transparent 70%);
+  top: -10%;
+  left: -10%;
+  animation-duration: 25s;
+}
+
+.blob-2 {
+  width: 50vw;
+  height: 50vh;
+  background: radial-gradient(circle, var(--accent-teal) 0%, transparent 60%);
+  bottom: -20%;
+  right: -10%;
+  animation-duration: 22s;
+  animation-direction: alternate-reverse;
+}
+
+.blob-3 {
+  width: 40vw;
+  height: 40vh;
+  background: radial-gradient(circle, var(--accent-amethyst) 0%, transparent 60%);
+  top: 30%;
+  left: 40%;
+  animation-duration: 18s;
+  opacity: 0.3;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(5%, 10%) scale(1.1) rotate(5deg); }
+  100% { transform: translate(-5%, -10%) scale(0.9) rotate(-5deg); }
+}
+
+/* Grain Overlay */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* =============================================
+   Scrollbar
+   ============================================= */
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border-strong);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* =============================================
+   Floating Dock (Sidebar Replacement)
+   ============================================= */
+
+.magnetic-dock {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 12px;
+  background: var(--bg-surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 32px;
+  box-shadow: var(--glass-shadow);
+  z-index: 100;
+}
+
+.dock-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.dock-item:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--glass-border-strong);
+  color: var(--text-primary);
+  transform: scale(1.1);
+}
+
+.dock-item.active {
+  background: var(--text-primary);
+  color: var(--bg-deep);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  transform: scale(1.15);
+}
+
+.dock-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Tooltip */
+.dock-item::after {
+  content: attr(data-label);
+  position: absolute;
+  left: calc(100% + 16px);
+  background: var(--bg-surface-active);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.dock-item:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* =============================================
+   App Layout & Views
+   ============================================= */
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  z-index: 10;
+  padding-left: 100px; /* Space for the dock */
+}
+
+.view-container {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  animation: fade-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-scale-in {
+  from { opacity: 0; transform: scale(0.98) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* =============================================
+   Chat Interface (Editorial Typography)
+   ============================================= */
+
+.chat-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px;
+  padding-bottom: 140px; /* Space for Island Input */
+}
+
+.chat-history {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Empty State */
+.chat-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+}
+
+.chat-empty h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 400;
+  font-style: italic;
+  background: linear-gradient(to right, #FFF, rgba(255,255,255,0.4));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+
+.chat-empty p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 300;
+  max-width: 400px;
+}
+
+/* Messages */
+.message-row {
+  display: flex;
+  flex-direction: column;
+  animation: slide-up-fade 0.4s ease-out forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes slide-up-fade {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.message-content {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+/* User Message: More transparent, flush right visually */
+.message-row.user {
+  align-items: flex-end;
+}
+.message-row.user .message-content {
+  background: var(--glass-gradient);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  padding: 16px 24px;
+  border-radius: 20px 20px 4px 20px;
+  max-width: 85%;
+}
+
+/* Assistant Message: Editorial reading experience */
+.message-row.assistant {
+  align-items: flex-start;
+}
+.message-row.assistant .message-content {
+  max-width: 100%;
+  padding-left: 24px;
+  border-left: 2px solid var(--glass-border-strong);
+}
+
+/* Markdown Rendering inside message */
+.message-content h1, .message-content h2, .message-content h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 1.5em 0 0.5em;
+}
+
+.message-content h1 { font-size: 32px; font-style: italic; }
+.message-content h2 { font-size: 24px; }
+.message-content p { margin-bottom: 1em; }
+.message-content p:last-child { margin-bottom: 0; }
+
+.message-content code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent-teal);
+}
+
+.message-content pre {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  position: relative;
+}
+
+.message-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--text-primary);
+}
+
+/* =============================================
+   Floating Island (Input Area)
+   ============================================= */
+
+.island-container {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* Let clicks pass through outside the island */
+  z-index: 50;
+}
+
+.island-input {
+  width: var(--island-width);
+  background: var(--bg-surface);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: 32px;
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  align-items: flex-end;
+  padding: 12px 20px;
+  gap: 16px;
+  pointer-events: auto;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.island-input:focus-within {
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 16px 48px -12px rgba(255,255,255,0.1);
+}
+
+.island-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  min-height: 24px;
+  max-height: 200px;
+  padding: 4px 0;
+}
+
+.island-textarea::placeholder {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.island-action-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.island-action-btn:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+}
+
+.island-action-btn.active {
+  color: var(--accent-teal);
+  background: rgba(45, 212, 191, 0.1);
+  border-color: rgba(45, 212, 191, 0.2);
+}
+
+.island-send-btn {
+  background: var(--text-primary);
+  color: var(--bg-deep);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  flex-shrink: 0;
+}
+
+.island-send-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(255,255,255,0.4);
+}
+
+.island-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+/* =============================================
+   Other Components Generic
+   ============================================= */
+
+/* We'll refine ImagePanel and Settings in their own styles but keep them minimal here */
+.panel-header {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 400;
+  margin-bottom: 32px;
+  background: linear-gradient(to right, #FFF, rgba(255,255,255,0.4));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
